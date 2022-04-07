@@ -1,0 +1,6 @@
+{
+  "name": "Payment Orchestration Sample App",
+  "description": "Use Universal Checkout and Payment Orchestration to securely accept and charge credit cards on the web.",
+  "repository": "https://github.com/mottersheadt/payment-orchestration-demo-app",
+  "logo": "https://d33wubrfki0l68.cloudfront.net/8b4d4f8ea6524dd0a65646020d19e3277c1ec010/fcc4b/img/press-and-assets/vgs-logo-color-stacked.png",
+}
