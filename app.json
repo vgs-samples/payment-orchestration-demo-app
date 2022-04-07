@@ -2,5 +2,32 @@
   "name": "Payment Orchestration Sample App",
   "description": "Use Universal Checkout and Payment Orchestration to securely accept and charge credit cards on the web.",
   "repository": "https://github.com/mottersheadt/payment-orchestration-demo-app",
-  "logo": "https://d33wubrfki0l68.cloudfront.net/8b4d4f8ea6524dd0a65646020d19e3277c1ec010/fcc4b/img/press-and-assets/vgs-logo-color-stacked.png"
+  "logo": "https://d33wubrfki0l68.cloudfront.net/8b4d4f8ea6524dd0a65646020d19e3277c1ec010/fcc4b/img/press-and-assets/vgs-logo-color-stacked.png",
+  "env": {
+    "CUSTOMER_VAULT_ID": {
+      "description": "Enter your vault ID",
+      "required": true
+    },
+    "CUSTOMER_VAULT_ACCESS_CREDS_USERNAME": {
+      "description": "Vault Access Credentials Username. This is used to connect to the outbound route proxy.",
+      "required": true
+    },
+    "CUSTOMER_VAULT_ACCESS_CREDS_SECRET": {
+      "description": "Vault Access Credentials Password. This is used to connect to the outbound route proxy.",
+      "required": true
+    },
+    "PAYMENT_ORCH_CLIENT_ID": {
+      "description": "Payment Orchestration Client ID that is connected to your vault.",
+      "required": true
+    },
+    "PAYMENT_ORCH_CLIENT_SECRET": {
+      "description": "Payment Orchestration Client Secret that is connected to your vault.",
+      "required": true
+    },
+    "PAYMENT_ORCH_APP_DOMAIN": {
+      "description": "Payment Orchestration environment to connect to.",
+      "required": true,
+      "value": "payments.sandbox.verygoodsecurity.app"
+    }
+  }
 }
