@@ -15,4 +15,4 @@ See this application in action by navigating to <https://payment-orchestration-s
 
 5. Update the "Upstream URL" on your new inbound route to point to your newly deployed version.
 
-6. Navigate to your deployed version and enter the Example Card perform a transaction.
+6. Navigate to your deployed version and enter the Example Credit Card Data to perform a transaction.
