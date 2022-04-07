@@ -8,10 +8,10 @@ See this application in action by navigating to <https://payment-orchestration-s
 [Gateway setup script](https://gist.github.com/mottersheadt/976b7f2418884fda2fc29dace2363b7b)
 
 3. Deploy a new instance of the app:
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/mottersheadt/payment-orchestration-demo-app)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/vgs-samples/payment-orchestration-demo-app)
 
 4. Upload Checkout.js yaml into your vault:
-[inbound.yaml](https://github.com/mottersheadt/payment-orchestration-demo-app/blob/main/app/static/routes/inbound.yaml)
+[inbound.yaml](https://github.com/vgs-samples/payment-orchestration-demo-app/blob/main/app/static/routes/inbound.yaml)
 
 5. Update the "Upstream URL" on your new inbound route to point to your newly deployed version.
 
