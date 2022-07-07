@@ -11,7 +11,9 @@ from flask_cors import CORS
 app = Flask('app.main')
 
 AUTH_API = "https://auth.verygoodsecurity.com/auth/realms/vgs/protocol/openid-connect/token"
+ROUTE_ID = os.environ.get('ROUTE_ID')
 CUSTOMER_VAULT_ID = os.environ.get('CUSTOMER_VAULT_ID')
+CUSTOMER_VAULT_ID_CHECKOUT_WEB_TESTS = os.environ.get('CUSTOMER_VAULT_ID_CHECKOUT_WEB_TESTS')
 PAYMENT_ORCH_APP_DOMAIN = os.environ.get('PAYMENT_ORCH_APP_DOMAIN')
 PAYMENT_ORCH_CLIENT_ID = os.environ.get('PAYMENT_ORCH_CLIENT_ID')
 PAYMENT_ORCH_CLIENT_SECRET = os.environ.get('PAYMENT_ORCH_CLIENT_SECRET')
@@ -23,6 +25,10 @@ CORS(app, resources={'/*': {'origins': '*'}})
 @app.route("/")
 def index():
     return render_template('./index.html', customerVaultId = CUSTOMER_VAULT_ID)
+
+@app.route("/checkout-web.html")
+def saveCards():
+    return render_template('./checkout-web.html', customerVaultId = f'{CUSTOMER_VAULT_ID_CHECKOUT_WEB_TESTS}-{ROUTE_ID}')
 
 @app.route("/checkout", methods=['POST'])
 def checkout():
