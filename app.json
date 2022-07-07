@@ -28,6 +28,14 @@
       "description": "Payment Orchestration environment to connect to.",
       "required": true,
       "value": "payments.sandbox.verygoodsecurity.app"
+    },
+    "ROUTE_ID": {
+      "description": "Route id from dashboard",
+      "required": true
+    },
+    "CUSTOMER_VAULT_ID_CHECKOUT_WEB_TESTS": {
+      "description": "vault ID for web",
+      "required": true
     }
   }
 }

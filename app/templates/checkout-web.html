@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Orchestration Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<h1 class="text-4xl mb-20 mt-5">Checkout Form Example</h1>
+
+<div class="container mx-auto max-w-4xl text-left">
+    <div class="flex flex-row min-h-[50%]">
+        <div class="basis-2/4">
+            <h2 class="text-3xl">Instructions</h2>
+            <div class="mt-3 pr-10">
+                <p>
+                    Checkout form will send requests directly to VGS Proxy to create financial instrument and perform money transfer.
+                </p>
+                <p class="mt-3">
+                    Fill out the form, click on "Save Card" checkbox and click on "ADD PAYMENT METHOD".
+                    The Universal Checkout will tokenize the sensitive card data.
+                </p>
+
+                <div class="stages mt-10">
+                    <div class="stage waiting" stage="create-financial-instrument">
+                        Create a financial instrument
+                    </div>
+                    <div class="stage waiting" stage="check-saved-cards">
+                        Check saved cards
+                    </div>
+                    <div class="stage waiting" stage="transfer-money">
+                        Perform money transfer
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="basis-2/4">
+            <div class="w-[450px] shadow-md rounded-md">
+                <div class="demo-data p-10 bg-slate-200">
+                    <h2 class="text-xl ">Example Credit Card Data</h2>
+                    <div class="flex flex-row">
+                        <span class="opacity-50">Cardholder Name:&nbsp;</span>
+                        <span class="">Thomas Anderson</span>
+                    </div>
+                    <div class="flex flex-row">
+                        <span class="opacity-50">Card number:&nbsp;</span>
+                        <span class="">4242 4242 4242 4242</span>
+                    </div>
+                    <div class="flex flex-row">
+                        <span class="opacity-50">Expiration Date:&nbsp;</span>
+                        <span class="">06/25</span>
+                    </div>
+                    <div class="flex flex-row ">
+                        <span class="opacity-50">CVC:&nbsp;</span>
+                        <span class="">100</span>
+                    </div>
+                </div>
+                <hr>
+                <div class="m-5">
+                    <a href="" id="reload">Reset Form</a>
+                </div>
+                <div id="vgs-checkout"></div>
+            </div>
+        </div>
+    </div>
+    <div id="server-logs-container" class="mt-20">
+        <h2 class="text-xl font-bold ">Logs</h2>
+        <div id="server-logs">
+            <div class="server-log-event">Loaded index.html page.</div>
+            <div class="server-log-event">Waiting for form submission...</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.verygoodvault.com/v1/"></script>
+<script type="text/javascript">
+    initCheckoutForm();
+
+    async function initCheckoutForm() {
+        const accessToken = await getAuthToken();
+        const checkout = new VGSCheckout.SavedCards({
+            vaultId: "{{customerVaultId}}",
+            environment: "sandbox",
+            submitPath: '',
+            cardsList: localStorage.getItem("cardsList")
+                ? localStorage.getItem("cardsList").split(",")
+                : [],
+            billingAddress: true,
+            billingAddressConfiguration: {
+                country: {
+                    visible: false,
+                },
+                address1: {
+                    visible: false,
+                },
+                address2: {
+                    visible: false,
+                },
+                city: {
+                    visible: false,
+                },
+                postalCode: {
+                    visible: false,
+                },
+            },
+            accessToken,
+        });
+
+        checkout.mount("#vgs-checkout", {
+            labels: {
+                submit: {
+                    ctaLabel: 'Add payment method'
+                }
+            }
+        });
+
+        checkout.on('SubmitStart', ({data}) => {
+            checkout.update({
+                formStatus: "loading"
+            });
+        });
+
+        checkout.on('AppMounted', (data) => {
+            console.log(data);
+        });
+
+        checkout.on('SubmitSuccess', ({ data, extra }) => {
+            const stages = {
+                "create-financial-instrument": {
+                    success: true
+                }
+            };
+
+            printLogs(['====== CREATE FINANCIAL INSTRUMENT ======']);
+            printLogs([JSON.stringify(data.data, null, 4)]);
+            if (extra?.saveCardChecked) {
+                const list = localStorage.getItem("cardsList")
+                    ? [...localStorage.getItem("cardsList").split(",")]
+                    : [];
+                list.push(data.data.id);
+                localStorage.setItem("cardsList", list.join());
+                checkout.update({
+                    cardsList: list,
+                });
+
+                Object.assign(stages, {
+                    "check-saved-cards": {
+                        success: true
+                    }
+                });
+
+                printLogs(['SAVE CARD CHECKED']);
+            } else {
+                checkout.update({
+                    formStatus: "success",
+                });
+            }
+
+            checkout.clear();
+
+            updateStages(stages);
+        })
+
+        checkout.on('SubmitFail', ({ data }) => {
+            checkout.update({
+                formStatus: "error"
+            });
+
+            updateStages({
+                "create-financial-instrument": {
+                    success: false
+                },
+                "check-saved-cards": {
+                    success: false
+                }
+            });
+        })
+
+        checkout.on("RemoveCard", ({ data: { id } }) => {
+            const list = localStorage.getItem("cardsList")
+                ? localStorage
+                    .getItem("cardsList")
+                    .split(",")
+                    .filter((el) => el !== id)
+                : [];
+            localStorage.setItem("cardsList", list.join());
+            checkout.update({
+                cardsList: list,
+            });
+        });
+    }
+
+    async function getAuthToken() {
+        const response = await fetch("https://multiplexing-demo.verygoodsecurity.io/get-auth-token", {
+            method: "POST",
+        });
+
+        const resData = await response.json();
+        return resData.access_token;
+    }
+
+    function updateStages(stages) {
+        if(!stages) return;
+
+        let els = document.getElementsByClassName('stage');
+
+        for(let i = 0; i < els.length; i++) {
+            const el = els[i];
+            const stage = els[i].attributes['stage'].value;
+            if (stages[stage]) {
+                if (stages[stage].success) {
+                    el.className = "stage success"
+                }
+                else {
+                    el.className = "stage failed"
+                }
+            }
+            else {
+                el.className = "stage not-done"
+            }
+        }
+    }
+
+    function printLogs(events) {
+        if(!events) return;
+        events.forEach(event => {
+            console.log(event)
+            if(typeof event === "object")
+                event = JSON.stringify(event, null, 4);
+            let eventEl = document.createElement("div");
+            eventEl.className = "server-log-event";
+            let formattedEvent = event
+            // Pretty print JSON
+            if(formattedEvent.indexOf('\n') != -1)
+                formattedEvent = event.replaceAll(" ", "&nbsp;").replaceAll("\n", "<br>");
+            eventEl.innerHTML = formattedEvent;
+            let serverLogsEl = document.getElementById("server-logs");
+            serverLogsEl.appendChild(eventEl);
+        })
+    }
+</script>
+</body>
+</html>
