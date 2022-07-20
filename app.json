@@ -27,7 +27,7 @@
     "PAYMENT_ORCH_APP_DOMAIN": {
       "description": "Payment Orchestration environment to connect to.",
       "required": true,
-      "value": "payments.sandbox.verygoodsecurity.app"
+      "value": "tntn5ie5n4c-4880868f-d88b-4333-ab70-d9deecdbffc4.sandbox.verygoodproxy.com"
     }
   }
 }
