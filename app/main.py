@@ -67,13 +67,9 @@ def create_financial_instrument(context, fin_instr_data, access_token):
     trace(context, 'See documentation page: <a href="https://www.verygoodsecurity.com/docs/payment-optimization/orchestration/api" target="_blank">payment-optimization/<b>orchestration/api</b></a> under "financial instruments" section.')
 
     fi_create_url = 'https://' + PAYMENT_ORCH_APP_DOMAIN + '/financial_instruments'
-    proxy_url = 'https://' + CUSTOMER_VAULT_ACCESS_CREDS_USERNAME + ':' + CUSTOMER_VAULT_ACCESS_CREDS_SECRET + '@' + CUSTOMER_VAULT_ID + '.sandbox.verygoodproxy.com:8443'
-    sanitized_proxy_url = 'https://' + CUSTOMER_VAULT_ACCESS_CREDS_USERNAME + ':***ACCESS_CREDENTIAL_PASSWORD***@' + CUSTOMER_VAULT_ID + '.sandbox.verygoodproxy.com:8443'
 
     trace(context, "Creating Financial Instrument by sending POST request to:")
     trace(context, "- " + fi_create_url)
-    trace(context, "Proxying Create Financial Instrument request through outbound route URL:")
-    trace(context, "- " + sanitized_proxy_url)
 
     headers = {
         "Content-Type": "application/json",
@@ -87,9 +83,6 @@ def create_financial_instrument(context, fin_instr_data, access_token):
     
     fin_instr = requests.post(
         fi_create_url,
-        proxies = {
-            'https': proxy_url,
-        },
         headers=headers,
         json = fin_instr_data,
         verify = False,

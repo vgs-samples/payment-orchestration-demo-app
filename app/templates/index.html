@@ -81,8 +81,9 @@
 	<script src="https://checkout.verygoodvault.com/v1/"></script>
 	<script type="text/javascript">
 	  const checkout = new VGSCheckout.Checkout({
-	    vaultId: "{{customerVaultId}}-f1d753f4-be63-4e24-a25f-59a0819fc867",
+	    vaultId: "{{customerVaultId}}",
 	    environment: "sandbox",
+		routeId: "f1d753f4-be63-4e24-a25f-59a0819fc867",
 	    submitPath: '/checkout',
 	    // uncomment, if you want to collect billing address
 	    // billingAddress: {
