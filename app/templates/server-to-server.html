@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Payment Orchestration Demo</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+	<h1 class="text-4xl mb-20 mt-5">Payment Orchestration Example</h1>
+
+	<div class="container mx-auto max-w-4xl text-left">
+		<div class="flex flex-row min-h-[50%]">
+			<div class="basis-2/4">
+				<h2 class="text-3xl">Instructions</h2>
+				<div class="mt-3 pr-10 ">
+					<p>
+						Upon clicking "PAY $1", Universal Checkout will tokenize the sensitive card data and forward it
+						to the upstream server configured on the inbound route.
+					</p>
+					<p class="mt-3">
+						The upstream server will then go through the following stages. For more detail on the exact
+						requests that the upstream server is sending, see the "Server Logs" section.
+					</p>
+
+					<div class="stages mt-10">
+						<div class="stage waiting" stage="received-checkout-payload">
+							Receive aliased form data
+						</div>
+						<div class="stage waiting" stage="generate-access-token">
+							Generate an access token
+						</div>
+						<div class="stage waiting" stage="create-financial-instrument">
+							Create a financial instrument
+						</div>
+						<div class="stage waiting" stage="transfer-money">
+							Perform a $1.00 money transfer
+						</div>
+					</div>
+					<div class="mt-3 bg-sky-100 border-sky-700 border-solid border-2 rounded-sm p-2 hidden" id="selected-gateway-container">
+						
+					</div>
+				</div>
+			</div>
+			<div class="basis-2/4">
+				<div class="w-[450px] shadow-md rounded-md">
+					<div class="demo-data p-10 bg-slate-200">
+						<h2 class="text-xl ">Example Credit Card Data</h2>
+						<div class="flex flex-row">
+							<span class="opacity-50">Cardholder Name:&nbsp;</span>
+							<span class="">Thomas Anderson</span>
+						</div>
+						<div class="flex flex-row">
+							<span class="opacity-50">Card number:&nbsp;</span>
+							<span class="">4242 4242 4242 4242</span>
+						</div>
+						<div class="flex flex-row">
+							<span class="opacity-50">Expiration Date:&nbsp;</span>
+							<span class="">06/25</span>
+						</div>
+						<div class="flex flex-row ">
+							<span class="opacity-50">CVC:&nbsp;</span>
+							<span class="">100</span>
+						</div>
+					</div>
+					<hr>
+					<div class="m-5">
+						<a href="" id="reload">Reset Form</a>
+					</div>
+					<div id="vgs-checkout"></div>
+				</div>
+			</div>
+		</div>
+		<div id="server-logs-container" class="mt-20">
+			<h2 class="text-xl font-bold">Server Logs</h2>
+			<div id="server-logs">
+				<div class="server-log-event">Loaded index.html page.</div>
+				<div class="server-log-event">Waiting for form submission...</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://checkout.verygoodvault.com/v1/"></script>
+	<script type="text/javascript">
+		const checkout = new VGSCheckout.Checkout({
+			vaultId: "{{customerVaultId}}",
+			environment: "sandbox",
+			routeId: false,
+			submitPath: '/checkout',
+			// uncomment, if you want to collect billing address
+			// billingAddress: {
+			//   validCountries: ["US", "CA"]
+			// },
+		});
+
+		checkout.mount("#vgs-checkout", {
+			labels: {
+				submit: {
+					ctaLabel: 'PAY $1'
+				}
+			}
+		});
+		checkout.on('SubmitStart', ({ data }) => {
+			checkout.update({
+				formStatus: "loading"
+			});
+		})
+
+		checkout.on('SubmitSuccess', ({ data }) => {
+			loadServerLogs(data.events)
+			updateStages(data.stages)
+			if (data.transfer && data.transfer.data.state === 'successful') {
+				checkout.update({
+					formStatus: "success"
+				});
+			} else {
+				checkout.update({
+					formStatus: "error"
+				});
+			}
+
+			if (data.transfer && data.transfer.data.gateway.type) {
+				let selected_gw_el = document.getElementById('selected-gateway-container')
+				selected_gw_el.classList.remove('hidden');
+				selected_gw_el.innerHTML = `Routed to Gateway: <b>${data.transfer.data.gateway.type}</b>`
+			}
+
+			document.getElementById('reload').style.display = "inline-block"
+		})
+
+		checkout.on('SubmitFail', ({ data }) => {
+			checkout.update({
+				formStatus: "error"
+			});
+			document.getElementById('reload').style.display = "inline-block"
+		})
+
+		function updateStages(stages) {
+			if (!stages) return;
+
+			let els = document.getElementsByClassName('stage');
+
+			for (var i = 0; i < els.length; i++) {
+				var el = els[i]; console.log(el)
+				var stage = els[i].attributes['stage'].value
+				if (stages[stage]) {
+					if (stages[stage].success) {
+						el.className = "stage success"
+					}
+					else {
+						el.className = "stage failed"
+					}
+				}
+				else {
+					el.className = "stage not-done"
+				}
+			}
+		}
+
+		function loadServerLogs(events) {
+			if (!events) return;
+			events.forEach(event => {
+				console.log(event)
+				if (typeof event === "object")
+					event = JSON.stringify(event, null, 4);
+				let eventEl = document.createElement("div");
+				eventEl.className = "server-log-event";
+				let formattedEvent = event
+				// Pretty print JSON
+				if (formattedEvent.indexOf('\n') != -1)
+					formattedEvent = event.replaceAll(" ", "&nbsp;").replaceAll("\n", "<br>");
+				eventEl.innerHTML = formattedEvent;
+				let serverLogsEl = document.getElementById("server-logs");
+				serverLogsEl.appendChild(eventEl);
+			})
+		}
+	</script>
+</body>
+
+</html>
