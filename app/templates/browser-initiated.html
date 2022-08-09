@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Payment Orchestration Demo</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+	<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+	<h1 class="text-4xl mb-20 mt-5">Payment Orchestration Example</h1>
+
+	<div class="container mx-auto max-w-4xl text-left">
+		<div class="flex flex-row min-h-[50%]">
+			<div class="basis-2/4">
+				<div class="w-[450px] shadow-md rounded-md">
+					<div id="vgs-checkout"></div>
+				</div>
+			</div>
+
+			<div id="financial-instrument-info" class="hidden basis-2/4 pl-4">
+				<select id="financial-instrument-selector"></select>
+				<div class="bg-slate-200 p-4 rounded-md">
+					<h2 class="text-2xl pb-2">Current Financial Instrument</h2>
+					<p><b>ID:</b> <span id="financial-instrument-id"></span></p>
+					<p><b>Card Alias</b> <span id="financial-instrument-alias"></span></p>
+					<p><b>Brand</b> <span id="financial-instrument-brand"></span></p>
+					<p><b>Address</b> <span id="financial-instrument-address"></span></p>
+					<p><b>Postal Code</b> <span id="financial-instrument-zip"></span></p>
+					<p><b>Country</b> <span id="financial-instrument-country"></span></p>
+				</div>
+				<div class="p-4">
+					<div class="mt-5">
+						<label><b>Amount</b></label>
+						<input id="amount" value="10" />
+					</div>
+					<div class="mt-5">
+						<label><b>Currency</b></label>
+						<select id="currency">
+							<option value="BRL" selected>BRL</option>
+							<option value="CAD">CAD</option>
+							<option value="USD">USD</option>
+						</select>
+					</div>
+					<div class="mt-5">
+						<label><b>Gateway Options</b></label>
+						<textarea name="gateway_options" id="gateway-options-editor" style="font-family: monospace;" class="w-[450px] h-[150px]">
+						</textarea>
+					</div>
+					<button id="post-transfer" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
+						Post Transfer
+					</button>
+				</div>
+				<div class="p-4" id="transfer-responses">
+					<div class="mt-3 p-2 hidden" id="transfer-response-template">
+						<div class="response-gateway"></div>
+						<div class="response-psp"></div>
+						<div class="response-message"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		window.customerVaultId = "{{customerVaultId}}"
+	</script>
+	<script src="https://checkout.verygoodvault.com/v1/"></script>
+	<script src="/static/js/browser_initiated.js"></script>
+</body>
+
+</html>

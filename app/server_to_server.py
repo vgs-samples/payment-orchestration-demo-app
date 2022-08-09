@@ -5,24 +5,22 @@ import requests
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 # Uncomment when running locally or with ngrok:
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
-app = Flask('app.main')
+app = Flask('app.server_to_server')
 
 AUTH_API = "https://auth.verygoodsecurity.com/auth/realms/vgs/protocol/openid-connect/token"
 CUSTOMER_VAULT_ID = os.environ.get('CUSTOMER_VAULT_ID')
-PAYMENT_ORCH_APP_DOMAIN = os.environ.get('PAYMENT_ORCH_APP_DOMAIN')
+PAYMENT_ORCH_APP_DOMAIN = f"{CUSTOMER_VAULT_ID}-4880868f-d88b-4333-ab70-d9deecdbffc4.sandbox.verygoodproxy.com"
 PAYMENT_ORCH_CLIENT_ID = os.environ.get('PAYMENT_ORCH_CLIENT_ID')
 PAYMENT_ORCH_CLIENT_SECRET = os.environ.get('PAYMENT_ORCH_CLIENT_SECRET')
-CUSTOMER_VAULT_ACCESS_CREDS_USERNAME = os.environ.get('CUSTOMER_VAULT_ACCESS_CREDS_USERNAME')
-CUSTOMER_VAULT_ACCESS_CREDS_SECRET = os.environ.get('CUSTOMER_VAULT_ACCESS_CREDS_SECRET')
 
 CORS(app, resources={'/*': {'origins': '*'}})
 
 @app.route("/")
 def index():
-    return render_template('./index.html', customerVaultId = CUSTOMER_VAULT_ID)
+    return render_template('./server-to-server.html', customerVaultId = CUSTOMER_VAULT_ID)
 
 @app.route("/checkout", methods=['POST'])
 def checkout():
@@ -70,6 +68,8 @@ def create_financial_instrument(context, fin_instr_data, access_token):
 
     trace(context, "Creating Financial Instrument by sending POST request to:")
     trace(context, "- " + fi_create_url)
+
+    fi_create_url = 'https://' + PAYMENT_ORCH_APP_DOMAIN + '/financial_instruments'
 
     headers = {
         "Content-Type": "application/json",
