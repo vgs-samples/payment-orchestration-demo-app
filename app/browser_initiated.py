@@ -63,7 +63,12 @@ def transfer():
         "amount": int(body['amount']) * 100,
         "currency": body['currency'],
         "source": body['financial_instrument_id'],
-        "gateway_options": json.loads(body['gateway_options'])
+        "gateway_options": json.loads(body['gateway_options']),
+        "source_override": {
+            "card": {
+                "cvc": "100"
+            }
+        }
     }
     access_token_response = _generate_access_token()
     headers = {

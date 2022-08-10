@@ -23,9 +23,8 @@
 			</div>
 
 			<div id="financial-instrument-info" class="hidden basis-2/4 pl-4">
-				<select id="financial-instrument-selector"></select>
-				<div class="bg-slate-200 p-4 rounded-md">
-					<h2 class="text-2xl pb-2">Current Financial Instrument</h2>
+				<select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="financial-instrument-selector"></select>
+				<div id="current-financial-instrument-info" class="bg-slate-200 p-4 rounded-md">
 					<p><b>ID:</b> <span id="financial-instrument-id"></span></p>
 					<p><b>Card Alias</b> <span id="financial-instrument-alias"></span></p>
 					<p><b>Brand</b> <span id="financial-instrument-brand"></span></p>
@@ -36,11 +35,11 @@
 				<div class="p-4">
 					<div class="mt-5">
 						<label><b>Amount</b></label>
-						<input id="amount" value="10" />
+						<input id="amount" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="10" />
 					</div>
 					<div class="mt-5">
 						<label><b>Currency</b></label>
-						<select id="currency">
+						<select id="currency" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
 							<option value="BRL" selected>BRL</option>
 							<option value="CAD">CAD</option>
 							<option value="USD">USD</option>
@@ -48,7 +47,7 @@
 					</div>
 					<div class="mt-5">
 						<label><b>Gateway Options</b></label>
-						<textarea name="gateway_options" id="gateway-options-editor" style="font-family: monospace;" class="w-[450px] h-[150px]">
+						<textarea name="gateway_options" id="gateway-options-editor" style="font-family: monospace;" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-[150px]">
 						</textarea>
 					</div>
 					<button id="post-transfer" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded">
